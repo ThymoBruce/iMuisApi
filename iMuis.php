@@ -33,14 +33,21 @@ class iMuis{
         return $debtor;
     }
 
-    public function createInvoice(array $invoiceData, array $debtorData, $newDebtor = null)
+    public function createInvoice($invoice, array $debtorData, $newDebtor = null)
     {
-        $debtor = $this->debtor->searchDebtor($debtorData["nr"], $debtorData["email"],$debtorData["postalcode"],$debtorData["housenumber"]);
+        $debtor = $this->debtor->searchDebtor($debtorData["nr"] ?? null, $debtorData["email"],$debtorData["zipcode"],$debtorData["housenumber"]);
         if(empty($debtor) && !empty($newDebtor)){
             $debtor = $this->debtor->createDebtor($newDebtor);
         }
         else throw new \Exception("not able to find or create debtor");
 
-        $invoice = $this->finance->createJournalpost($invoiceData);
+        try {
+            $invoice = $this->finance->createJournalpost($invoice);
+        }
+        catch(\Exception $exception){
+            return $exception->getMessage();
+        }
+
+        return false;
     }
 }
